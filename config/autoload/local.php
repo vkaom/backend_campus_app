@@ -11,7 +11,7 @@
 if ($_SERVER['REMOTE_ADDR'] == "127.0.0.1") {
     $DB_USERNAME = "root";
     $DB_PASSWORD = "";
-    $DB_NAME = "camemis_dev_learning";
+    $DB_NAME = "camemis_admin";
 } else {
     $DB_USERNAME = "root";
     $DB_PASSWORD = "";

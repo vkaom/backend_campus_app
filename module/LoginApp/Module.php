@@ -2,15 +2,19 @@
 
 namespace LoginApp;
 
+use Zend\Db\Adapter\Driver\ResultInterface;
+use Zend\Db\ResultSet\ResultSet;
+
 use Zend\Mvc\ModuleRouteListener;
 use Zend\Mvc\MvcEvent;
 use Zend\View\Model\JsonModel;
+use Zend\Db\Sql\Sql;
 
 class Module
 {
     public function onBootstrap(MvcEvent $e)
     {
-        $eventManager        = $e->getApplication()->getEventManager();
+        $eventManager = $e->getApplication()->getEventManager();
         $moduleRouteListener = new ModuleRouteListener();
         $moduleRouteListener->attach($eventManager);
 
@@ -49,8 +53,8 @@ class Module
         }
 
         $errorJson = array(
-            'message'   => 'An error occurred during execution; please try again later.',
-            'error'     => $error,
+            'message' => 'An error occurred during execution; please try again later.',
+            'error' => $error,
             'exception' => $exceptionJson,
         );
         if ($error == 'error-router-no-match') {
@@ -76,6 +80,23 @@ class Module
                 'namespaces' => array(
                     __NAMESPACE__ => __DIR__ . '/src/' . __NAMESPACE__,
                 ),
+            ),
+        );
+    }
+
+    public function getServiceConfig()
+    {
+        return array(
+            'factories' => array(
+                'AuthService' => function ($sm) {
+                    //return $sm->get('AdminAdapter');
+                    $sql = new Sql($sm->get('AdminAdapter'));
+                    $select = $sql->select();
+                    $select->from('t_customer', array('*'));
+                    $statement = $sql->prepareStatementForSqlObject($select);
+                    $resultSet= new ResultSet(ResultSet::TYPE_ARRAY);
+                    return $resultSet->initialize($statement->execute())->toArray();
+                },
             ),
         );
     }

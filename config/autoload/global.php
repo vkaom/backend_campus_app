@@ -22,7 +22,27 @@
 return array(
     'service_manager' => array(
         'factories' => array(
-            'Zend\Db\Adapter\Adapter' => 'Zend\Db\Adapter\AdapterServiceFactory',
+            'AdminAdapter' => 'Zend\Db\Adapter\AdapterServiceFactory',
+            'Institution' => function ($sm) {
+                //return $sm->get('AdminAdapter');
+                $sql = new Sql($sm->get('AdminAdapter'));
+                $select = $sql->select();
+                $select->from('t_customer', array('*'));
+                $statement = $sql->prepareStatementForSqlObject($select);
+                $resultSet= new ResultSet(ResultSet::TYPE_ARRAY);
+                return $resultSet->initialize($statement->execute())->toArray();
+            },
         ),
     ),
+
+
+    /**
+     *  //return $sm->get('AdminAdapter');
+    $sql = new Sql($sm->get('AdminAdapter'));
+    $select = $sql->select();
+    $select->from('t_customer', array('*'));
+    $statement = $sql->prepareStatementForSqlObject($select);
+    $resultSet= new ResultSet(ResultSet::TYPE_ARRAY);
+    return $resultSet->initialize($statement->execute())->toArray();
+     */
 );
