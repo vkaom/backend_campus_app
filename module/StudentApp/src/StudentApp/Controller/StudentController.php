@@ -1,13 +1,13 @@
 <?php
 namespace StudentApp\Controller;
 
-use AlbumApi\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
 
 class StudentController extends AbstractRestfulJsonController
 {
     public function getList()
-    {   // Action used for GET requests without resource Id
+    {   
+       
         return new JsonModel(
             array('data' =>
                 array(

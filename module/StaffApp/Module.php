@@ -2,6 +2,8 @@
 
 namespace StaffApp;
 
+use Zend\Session\Container;
+use Zend\Db\Adapter\Adapter;
 use Zend\Mvc\ModuleRouteListener;
 use Zend\Mvc\MvcEvent;
 use Zend\View\Model\JsonModel;
@@ -35,7 +37,6 @@ class Module
             return;
         }
 
-        $response = $e->getResponse();
         $exception = $e->getParam('exception');
         $exceptionJson = array();
         if ($exception) {
@@ -77,6 +78,25 @@ class Module
                     __NAMESPACE__ => __DIR__ . '/src/' . __NAMESPACE__,
                 ),
             ),
+        );
+    }
+
+    public function getServiceConfig()
+    {
+        return array(
+            'factories' => array(
+                'UserAdapter' => function ($sm) {
+                    $config = $sm->get('config');
+                    $session = new Container();
+                    $dbAdapterConfig = array(
+                        'driver' => $config["db"]["driver"],
+                        'dsn' => "mysql:dbname=" . $session->offsetGet('choose_db_name') . ";host=localhost",
+                        'username' => $config["db"]["username"],
+                        'password' => $config["db"]["password"],
+                    );
+                    return new Adapter($dbAdapterConfig);
+                },
+            )
         );
     }
 }

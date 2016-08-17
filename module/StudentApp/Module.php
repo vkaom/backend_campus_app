@@ -2,15 +2,16 @@
 
 namespace StudentApp;
 
+use Zend\Session\Container;
+use Zend\Db\Adapter\Adapter;
 use Zend\Mvc\ModuleRouteListener;
 use Zend\Mvc\MvcEvent;
 use Zend\View\Model\JsonModel;
 
-class Module
-{
-    public function onBootstrap(MvcEvent $e)
-    {
-        $eventManager        = $e->getApplication()->getEventManager();
+class Module {
+
+    public function onBootstrap(MvcEvent $e) {
+        $eventManager = $e->getApplication()->getEventManager();
         $moduleRouteListener = new ModuleRouteListener();
         $moduleRouteListener->attach($eventManager);
 
@@ -18,24 +19,20 @@ class Module
         $eventManager->attach(MvcEvent::EVENT_RENDER_ERROR, array($this, 'onRenderError'), 0);
     }
 
-    public function onDispatchError($e)
-    {
+    public function onDispatchError($e) {
         return $this->getJsonModelError($e);
     }
 
-    public function onRenderError($e)
-    {
+    public function onRenderError($e) {
         return $this->getJsonModelError($e);
     }
 
-    public function getJsonModelError($e)
-    {
+    public function getJsonModelError($e) {
         $error = $e->getError();
         if (!$error) {
             return;
         }
 
-        $response = $e->getResponse();
         $exception = $e->getParam('exception');
         $exceptionJson = array();
         if ($exception) {
@@ -49,8 +46,8 @@ class Module
         }
 
         $errorJson = array(
-            'message'   => 'An error occurred during execution; please try again later.',
-            'error'     => $error,
+            'message' => 'An error occurred during execution; please try again later.',
+            'error' => $error,
             'exception' => $exceptionJson,
         );
         if ($error == 'error-router-no-match') {
@@ -64,13 +61,11 @@ class Module
         return $model;
     }
 
-    public function getConfig()
-    {
+    public function getConfig() {
         return include __DIR__ . '/config/module.config.php';
     }
 
-    public function getAutoloaderConfig()
-    {
+    public function getAutoloaderConfig() {
         return array(
             'Zend\Loader\StandardAutoloader' => array(
                 'namespaces' => array(
@@ -79,4 +74,24 @@ class Module
             ),
         );
     }
+
+    public function getServiceConfig()
+    {
+        return array(
+            'factories' => array(
+                'UserAdapter' => function ($sm) {
+                    $config = $sm->get('config');
+                    $session = new Container();
+                    $dbAdapterConfig = array(
+                        'driver' => $config["db"]["driver"],
+                        'dsn' => "mysql:dbname=" . $session->offsetGet('choose_db_name') . ";host=localhost",
+                        'username' => $config["db"]["username"],
+                        'password' => $config["db"]["password"],
+                    );
+                    return new Adapter($dbAdapterConfig);
+                }
+            ),
+        );
+    }
+
 }

@@ -2,16 +2,15 @@
 
 namespace LoginApp;
 
-use Zend\Db\Adapter\Driver\ResultInterface;
-use Zend\Db\ResultSet\ResultSet;
-
+use Zend\Session\Container;
+use Zend\Db\Adapter\Adapter;
 use Zend\Mvc\ModuleRouteListener;
 use Zend\Mvc\MvcEvent;
 use Zend\View\Model\JsonModel;
-use Zend\Db\Sql\Sql;
 
 class Module
 {
+
     public function onBootstrap(MvcEvent $e)
     {
         $eventManager = $e->getApplication()->getEventManager();
@@ -39,7 +38,6 @@ class Module
             return;
         }
 
-        $response = $e->getResponse();
         $exception = $e->getParam('exception');
         $exceptionJson = array();
         if ($exception) {
@@ -88,16 +86,19 @@ class Module
     {
         return array(
             'factories' => array(
-                'AuthService' => function ($sm) {
-                    //return $sm->get('AdminAdapter');
-                    $sql = new Sql($sm->get('AdminAdapter'));
-                    $select = $sql->select();
-                    $select->from('t_customer', array('*'));
-                    $statement = $sql->prepareStatementForSqlObject($select);
-                    $resultSet= new ResultSet(ResultSet::TYPE_ARRAY);
-                    return $resultSet->initialize($statement->execute())->toArray();
+                'UserAdapter' => function ($sm) {
+                    $config = $sm->get('config');
+                    $session = new Container();
+                    $dbAdapterConfig = array(
+                        'driver' => $config["db"]["driver"],
+                        'dsn' => "mysql:dbname=" . $session->offsetGet('choose_db_name') . ";host=localhost",
+                        'username' => $config["db"]["username"],
+                        'password' => $config["db"]["password"],
+                    );
+                    return new Adapter($dbAdapterConfig);
                 },
             ),
         );
     }
 }
+        
