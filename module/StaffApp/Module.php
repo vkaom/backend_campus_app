@@ -1,21 +1,32 @@
 <?php
 
+/* * ***************************************************************************
+* Copyright (C) 2016 {KAOM Vibolrith} <{vibolrith@gmail.com}>
+*
+* This file is part of CAMEMIS App.
+*
+* {CAMEMIS App} can not be copied and/or distributed without the express
+* permission of {KAOM Vibolrith, Vikensoft Germany}
+* ************************************************************************** */
 namespace StaffApp;
 
 use Zend\Session\Container;
 use Zend\Db\Adapter\Adapter;
 use Zend\Mvc\ModuleRouteListener;
 use Zend\Mvc\MvcEvent;
+use Zend\Db\ResultSet\ResultSet;
 use Zend\View\Model\JsonModel;
+use Zend\Db\TableGateway\TableGateway;
+use StaffApp\Model\Staff;
+use StaffApp\Model\StaffTable;
 
 class Module
 {
     public function onBootstrap(MvcEvent $e)
     {
-        $eventManager        = $e->getApplication()->getEventManager();
+        $eventManager = $e->getApplication()->getEventManager();
         $moduleRouteListener = new ModuleRouteListener();
         $moduleRouteListener->attach($eventManager);
-
         $eventManager->attach(MvcEvent::EVENT_DISPATCH_ERROR, array($this, 'onDispatchError'), 0);
         $eventManager->attach(MvcEvent::EVENT_RENDER_ERROR, array($this, 'onRenderError'), 0);
     }
@@ -50,8 +61,8 @@ class Module
         }
 
         $errorJson = array(
-            'message'   => 'An error occurred during execution; please try again later.',
-            'error'     => $error,
+            'message' => 'An error occurred during execution; please try again later.',
+            'error' => $error,
             'exception' => $exceptionJson,
         );
         if ($error == 'error-router-no-match') {
@@ -95,6 +106,16 @@ class Module
                         'password' => $config["db"]["password"],
                     );
                     return new Adapter($dbAdapterConfig);
+                }, 'StaffApp\Model\StaffTable' => function ($sm) {
+                    $tableGateway = $sm->get('StaffTableGateway');
+                    $table = new StaffTable($tableGateway);
+                    return $table;
+                },
+                'StaffTableGateway' => function ($sm) {
+                    $dbAdapter = $sm->get('UserAdapter');
+                    $resultSetPrototype = new ResultSet();
+                    $resultSetPrototype->setArrayObjectPrototype(new Staff());
+                    return new TableGateway('t_staff', $dbAdapter, null, $resultSetPrototype);
                 },
             )
         );

@@ -1,4 +1,13 @@
 <?php
+
+/* * ***************************************************************************
+* Copyright (C) 2016 {KAOM Vibolrith} <{vibolrith@gmail.com}>
+*
+* This file is part of CAMEMIS App.
+*
+* {CAMEMIS App} can not be copied and/or distributed without the express
+* permission of {KAOM Vibolrith, Vikensoft Germany}
+* ************************************************************************** */
 /**
  * Created by PhpStorm.
  * User: Sao
@@ -6,9 +15,9 @@
  * Time: 00:31
  */
 
-namespace StudentApp\Model;
+namespace StaffApp\Model;
 
-class Student
+class Staff
 {
     public $id;
     public $firstname;

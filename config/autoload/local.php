@@ -37,10 +37,5 @@ return array(
         'driver_options' => array(
             PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES \'UTF8\''
         ),
-    ),
-    'service_manager' => array(
-        'aliases' => array(
-            'db_access' => 'Zend\Db\Adapter\Adapter',
-        ),
     )
 );

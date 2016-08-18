@@ -8,6 +8,10 @@ use Zend\Mvc\ModuleRouteListener;
 use Zend\Mvc\MvcEvent;
 use Zend\View\Model\JsonModel;
 
+use Zend\Di\Di;
+use Zend\Di\Definition;
+use Zend\Di\Definition\Builder;
+
 class Module
 {
 
@@ -86,17 +90,19 @@ class Module
     {
         return array(
             'factories' => array(
+                "Session" => function () {
+                    return new Container();
+                },
                 'UserAdapter' => function ($sm) {
                     $config = $sm->get('config');
-                    $session = new Container();
                     $dbAdapterConfig = array(
                         'driver' => $config["db"]["driver"],
-                        'dsn' => "mysql:dbname=" . $session->offsetGet('choose_db_name') . ";host=localhost",
+                        'dsn' => "mysql:dbname=" . $sm->get('Session')->offsetGet('choose_db_name') . ";host=localhost",
                         'username' => $config["db"]["username"],
                         'password' => $config["db"]["password"],
                     );
                     return new Adapter($dbAdapterConfig);
-                },
+                }
             ),
         );
     }
