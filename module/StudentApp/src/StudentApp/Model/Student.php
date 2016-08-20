@@ -1,35 +1,109 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Sao
- * Date: 19.08.2016
- * Time: 00:31
- */
+/* * ***************************************************************************
+* Copyright (C) 2016 {KAOM Vibolrith} <{vibolrith@gmail.com}>
+*
+* This file is part of CAMEMIS App.
+*
+* {CAMEMIS App} can not be copied and/or distributed without the express
+* permission of {KAOM Vibolrith, CAMEMIS Germany}
+* ************************************************************************** */
 
 namespace StudentApp\Model;
 
 class Student
 {
-    public $id;
-    public $firstname;
-    public $lastname;
-    public $gender;
-    public $code;
-    public $firstname_latine;
-    public $lastname_latine;
-    public $date_birth;
-    public $email;
 
-    public function exchangeArray($data)
+    protected $ID;
+    protected $FIRSTNAME;
+    protected $LASTNAME;
+    protected $GENDER;
+    protected $PHONE;
+
+    public function __construct(array $options = null)
     {
-        $this->id = (!empty($data['id'])) ? $data['id'] : null;
-        $this->firstname = (!empty($data['firstname'])) ? $data['firstname'] : null;
-        $this->lastname = (!empty($data['lastname'])) ? $data['lastname'] : null;
-        $this->gender = (!empty($data['gender'])) ? $data['gender'] : null;
-        $this->code = (!empty($data['code'])) ? $data['code'] : null;
-        $this->firstname_latine = (!empty($data['firstname_latine'])) ? $data['firstname_latine'] : null;
-        $this->lastname_latine = (!empty($data['lastname_latine'])) ? $data['lastname_latine'] : null;
-        $this->date_birth = (!empty($data['date_birth'])) ? $data['date_birth'] : null;
-        $this->email = (!empty($data['email'])) ? $data['email'] : null;
+        if (is_array($options)) {
+            $this->setOptions($options);
+        }
     }
+
+    public function __set($name, $value)
+    {
+        $method = 'set' . $name;
+        if (!method_exists($this, $method)) {
+            throw new Exception('Invalid Method');
+        }
+        $this->$method($value);
+    }
+
+    public function __get($name)
+    {
+        $method = 'get' . $name;
+        if (!method_exists($this, $method)) {
+            throw new Exception('Invalid Method');
+        }
+        return $this->$method();
+    }
+
+    public function setOptions(array $options)
+    {
+        $methods = get_class_methods($this);
+        foreach ($options as $key => $value) {
+            $method = 'set' . ucfirst($key);
+            if (in_array($method, $methods)) {
+                $this->$method($value);
+            }
+        }
+        return $this;
+    }
+
+    public function getId()
+    {
+        return $this->ID;
+    }
+
+    public function setId($v)
+    {
+        $this->ID = $v;
+    }
+
+    public function getFirstname()
+    {
+        return $this->FIRSTNAME;
+    }
+
+    public function setFirstname($v)
+    {
+        $this->FIRSTNAME = $v;
+    }
+
+    public function getLastname()
+    {
+        return $this->LASTNAME;
+    }
+
+    public function getGender()
+    {
+        return $this->GENDER;
+    }
+
+    public function setGender($v)
+    {
+        $this->GENDER = $v;
+    }
+
+    public function setLastname($v)
+    {
+        $this->LASTNAME = $v;
+    }
+
+    public function setPhone($v)
+    {
+        $this->PHONE = $v;
+    }
+
+    public function getPhone()
+    {
+        return $this->PHONE;
+    }
+
 }

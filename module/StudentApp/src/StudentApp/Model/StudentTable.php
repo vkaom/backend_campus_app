@@ -1,64 +1,86 @@
 <?php
-
 /* * ***************************************************************************
 * Copyright (C) 2016 {KAOM Vibolrith} <{vibolrith@gmail.com}>
 *
 * This file is part of CAMEMIS App.
 *
 * {CAMEMIS App} can not be copied and/or distributed without the express
-* permission of {KAOM Vibolrith, Vikensoft Germany}
+* permission of {KAOM Vibolrith, CAMEMIS Germany}
 * ************************************************************************** */
+
 namespace StudentApp\Model;
 
-use Zend\Db\TableGateway\TableGateway;
+use Zend\Db\Adapter\Adapter;
+use Zend\Db\TableGateway\AbstractTableGateway;
+use Zend\Db\Sql\Select;
 
-class StudentTable
+class StudentTable extends AbstractTableGateway
 {
-    protected $tableGateway;
 
-    public function __construct(TableGateway $tableGateway)
+    protected $table = 't_student';
+
+    public function __construct(Adapter $adapter)
     {
-        $this->tableGateway = $tableGateway;
+        $this->adapter = $adapter;
     }
 
     public function fetchAll()
     {
-        $resultSet = $this->tableGateway->select();
-        return $resultSet;
+        $resultSet = $this->select(function (Select $select) {
+            $select->order('lastname ASC');
+        });
+        $entities = array();
+        foreach ($resultSet as $row) {
+            $entity = new Student();
+            $entity->setId($row->ID);
+            $entity->setGender($row->GENDER);
+            $entity->getLastname($row->LASTNAME);
+            $entity->setFirstname($row->FIRSTNAME);
+            $entity->setPhone($row->PHONE);
+            $entities[] = $entity;
+        }
+        return $entities;
     }
 
     public function getStudent($id)
     {
-        $id  = (int) $id;
-        $rowset = $this->tableGateway->select(array('id' => $id));
-        $row = $rowset->current();
-        if (!$row) {
-            throw new \Exception("Could not find row $id");
-        }
-        return $row;
+        $row = $this->select(array('id' => (int)$id))->current();
+        if (!$row)
+            return false;
+
+        $student = new Student(array(
+            'ID' => $row->ID,
+            'LASTNAME' => $row->LASTNAME,
+            'FIRSTNAME' => $row->FIRSTNAME,
+        ));
+        return $student;
     }
 
     public function saveStudent(Student $student)
     {
         $data = array(
-            'lastname' => $student->lastname,
-            'firstname'  => $student->firstname,
+            'LASTNAME' => $student->getLastname(),
+            'FIRSTNAME' => $student->getFirstname(),
         );
 
-        $id = (int) $student->id;
+        $id = (int)$student->getId();
+
         if ($id == 0) {
-            $this->tableGateway->insert($data);
-        } else {
-            if ($this->getStudent($id)) {
-                $this->tableGateway->update($data, array('id' => $id));
-            } else {
-                throw new \Exception('Student id does not exist');
-            }
-        }
+            $data['created'] = date("Y-m-d H:i:s");
+            if (!$this->insert($data))
+                return false;
+            return $this->getLastInsertValue();
+        } elseif ($this->getStudent($id)) {
+            if (!$this->update($data, array('id' => $id)))
+                return false;
+            return $id;
+        } else
+            return false;
     }
 
-    public function deleteStudent($id)
+    public function removeStudent($id)
     {
-        $this->tableGateway->delete(array('id' => (int) $id));
+        return $this->delete(array('id' => (int)$id));
     }
+
 }

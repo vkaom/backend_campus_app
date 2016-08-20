@@ -91,7 +91,7 @@ class IndexController extends AbstractRestfulJsonController
      */
     protected function setChooseDBName($mobileUri)
     {
-        $this->getServiceLocator()->get('Session')->offsetSet('choose_db_name', $this->getUserDB($mobileUri));
+        $this->getServiceLocator()->get('Session')->offsetSet('USER_DB', $this->getUserDB($mobileUri));
     }
 
 }

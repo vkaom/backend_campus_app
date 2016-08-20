@@ -1,5 +1,12 @@
 <?php
-
+/* * ***************************************************************************
+* Copyright (C) 2016 {KAOM Vibolrith} <{vibolrith@gmail.com}>
+*
+* This file is part of CAMEMIS App.
+*
+* {CAMEMIS App} can not be copied and/or distributed without the express
+* permission of {KAOM Vibolrith, CAMEMIS Germany}
+* ************************************************************************** */
 namespace LoginApp;
 
 use Zend\Session\Container;
@@ -93,11 +100,14 @@ class Module
                 "Session" => function () {
                     return new Container();
                 },
+                "UserLogin" => function ($sm) {
+                    return $sm->get("Session")->offsetExists('tokenId');
+                },
                 'UserAdapter' => function ($sm) {
                     $config = $sm->get('config');
                     $dbAdapterConfig = array(
                         'driver' => $config["db"]["driver"],
-                        'dsn' => "mysql:dbname=" . $sm->get('Session')->offsetGet('choose_db_name') . ";host=localhost",
+                        'dsn' => "mysql:dbname=" . $sm->get('Session')->offsetGet('USER_DB') . ";host=localhost",
                         'username' => $config["db"]["username"],
                         'password' => $config["db"]["password"],
                     );

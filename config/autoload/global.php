@@ -1,24 +1,12 @@
 <?php
-
-/* * ***************************************************************************
- * Copyright (C) 2015 {KAOM Vibolrith} <{vibolrith@gmail.com}>
- * 
- * This file is part of CAMEMIS Learning.
- * 
- * {CAMEMIS Learning} can not be copied and/or distributed without the express
- * permission of {KAOM Vibolrith, Vikensoft Germany}
- * ************************************************************************** */
-/**
- * Global Configuration Override
+/*******************************************************************************
+ * Copyright (C) 2016 {KAOM Vibolrith} <{vibolrith@gmail.com}>
  *
- * You can use this file for overridding configuration values from modules, etc.
- * You would place values in here that are agnostic to the environment and not
- * sensitive to security.
+ * This file is part of CAMEMIS App.
  *
- * @NOTE: In practice, this file will typically be INCLUDED in your source
- * control, so do not include passwords or other sensitive information in this
- * file.
- */
+ * {CAMEMIS App} can not be copied and/or distributed without the express
+ * permission of {KAOM Vibolrith, CAMEMIS Germany}
+ ******************************************************************************/
 return array(
     'service_manager' => array(
         'factories' => array(

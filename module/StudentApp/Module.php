@@ -1,28 +1,22 @@
 <?php
-
-/* * ***************************************************************************
+/*******************************************************************************
 * Copyright (C) 2016 {KAOM Vibolrith} <{vibolrith@gmail.com}>
 *
 * This file is part of CAMEMIS App.
 *
 * {CAMEMIS App} can not be copied and/or distributed without the express
-* permission of {KAOM Vibolrith, Vikensoft Germany}
-* ************************************************************************** */
+* permission of {KAOM Vibolrith, CAMEMIS Germany}
+******************************************************************************/
 namespace StudentApp;
 
-use Zend\Session\Container;
-use Zend\Db\Adapter\Adapter;
 use Zend\Mvc\ModuleRouteListener;
 use Zend\Mvc\MvcEvent;
-use Zend\Db\ResultSet\ResultSet;
 use Zend\View\Model\JsonModel;
-use Zend\Db\TableGateway\TableGateway;
 use StudentApp\Model\Student;
 use StudentApp\Model\StudentTable;
 
 class Module
 {
-
     public function onBootstrap(MvcEvent $e)
     {
         $eventManager = $e->getApplication()->getEventManager();
@@ -98,30 +92,11 @@ class Module
     {
         return array(
             'factories' => array(
-                "Session" => function () {
-                    return new Container();
-                },
-                'UserAdapter' => function ($sm) {
-                    $config = $sm->get('config');
-                    $dbAdapterConfig = array(
-                        'driver' => $config["db"]["driver"],
-                        'dsn' => "mysql:dbname=" . $sm->get("Session")->offsetGet('choose_db_name') . ";host=localhost",
-                        'username' => $config["db"]["username"],
-                        'password' => $config["db"]["password"],
-                    );
-                    return new Adapter($dbAdapterConfig);
-                }, 'StudentApp\Model\StudentTable' => function ($sm) {
-                    $tableGateway = $sm->get('StudentTableGateway');
-                    $table = new StudentTable($tableGateway);
+                'StudentApp\Model\StudentTable' => function($sm) {
+                    $dbAdapter = $sm->get('UserAdapter');
+                    $table = new StudentTable($dbAdapter);
                     return $table;
                 },
-                'StudentTableGateway' => function ($sm) {
-                    $dbAdapter = $sm->get('UserAdapter');
-                    $resultSetPrototype = new ResultSet();
-                    $resultSetPrototype->setArrayObjectPrototype(new Student());
-                    return new TableGateway('t_student', $dbAdapter, null, $resultSetPrototype);
-                },
-
             ),
         );
     }

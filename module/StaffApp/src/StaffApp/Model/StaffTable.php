@@ -1,72 +1,84 @@
 <?php
+/*******************************************************************************
+ * Copyright (C) 2016 {KAOM Vibolrith} <{vibolrith@gmail.com}>
+ *
+ * This file is part of CAMEMIS App.
+ *
+ * {CAMEMIS App} can not be copied and/or distributed without the express
+ * permission of {KAOM Vibolrith, CAMEMIS Germany}
+ ******************************************************************************/
 
-/* * ***************************************************************************
-* Copyright (C) 2016 {KAOM Vibolrith} <{vibolrith@gmail.com}>
-*
-* This file is part of CAMEMIS App.
-*
-* {CAMEMIS App} can not be copied and/or distributed without the express
-* permission of {KAOM Vibolrith, Vikensoft Germany}
-* ************************************************************************** */
-/* * ***************************************************************************
-* Copyright (C) 2015 {KAOM Vibolrith} <{vibolrith@gmail.com}>
-*
-* This file is part of CAMEMIS Learning.
-*
-* {CAMEMIS Learning} can not be copied and/or distributed without the express
-* permission of {KAOM Vibolrith, Vikensoft Germany}
-* ************************************************************************** */
 namespace StaffApp\Model;
 
-use Zend\Db\TableGateway\TableGateway;
+use Zend\Db\Adapter\Adapter;
+use Zend\Db\TableGateway\AbstractTableGateway;
+use Zend\Db\Sql\Select;
 
-class StaffTable
+class StaffTable extends AbstractTableGateway
 {
-    protected $tableGateway;
 
-    public function __construct(TableGateway $tableGateway)
+    protected $table = 't_members';
+
+    public function __construct(Adapter $adapter)
     {
-        $this->tableGateway = $tableGateway;
+        $this->adapter = $adapter;
     }
 
     public function fetchAll()
     {
-        $resultSet = $this->tableGateway->select();
-        return $resultSet;
+        $resultSet = $this->select(function (Select $select) {
+            $select->order('lastname ASC');
+        });
+        $entities = array();
+        foreach ($resultSet as $row) {
+            $entity = new Entity\Staff();
+            $entity->setId($row->id)
+                ->setLastname($row->lastname)
+                ->setFirstname($row->firstname);
+            $entities[] = $entity;
+        }
+        return $entities;
     }
 
     public function getStaff($id)
     {
-        $id  = (int) $id;
-        $rowset = $this->tableGateway->select(array('id' => $id));
-        $row = $rowset->current();
-        if (!$row) {
-            throw new \Exception("Could not find row $id");
-        }
-        return $row;
+        $row = $this->select(array('id' => (int)$id))->current();
+        if (!$row)
+            return false;
+
+        $staff = new Entity\Staff(array(
+            'id' => $row->id,
+            'lastname' => $row->lastname,
+            'firstname' => $row->firstname,
+        ));
+        return $staff;
     }
 
-    public function saveStaff(Staff $staff)
+    public function saveStudent(Entity\Staff $staff)
     {
         $data = array(
-            'lastname' => $staff->lastname,
-            'firstname'  => $staff->firstname,
+            'lastname' => $staff->getLastname(),
+            'firstname' => $staff->getFirstname(),
         );
 
-        $id = (int) $staff->id;
+        $id = (int)$staff->getId();
+
         if ($id == 0) {
-            $this->tableGateway->insert($data);
-        } else {
-            if ($this->getStaff($id)) {
-                $this->tableGateway->update($data, array('id' => $id));
-            } else {
-                throw new \Exception('Staff id does not exist');
-            }
-        }
+            $data['created'] = date("Y-m-d H:i:s");
+            if (!$this->insert($data))
+                return false;
+            return $this->getLastInsertValue();
+        } elseif ($this->getStaff($id)) {
+            if (!$this->update($data, array('id' => $id)))
+                return false;
+            return $id;
+        } else
+            return false;
     }
 
-    public function deleteStaff($id)
+    public function removeStaff($id)
     {
-        $this->tableGateway->delete(array('id' => (int) $id));
+        return $this->delete(array('id' => (int)$id));
     }
+
 }

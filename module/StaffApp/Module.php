@@ -1,22 +1,17 @@
 <?php
-
 /* * ***************************************************************************
 * Copyright (C) 2016 {KAOM Vibolrith} <{vibolrith@gmail.com}>
 *
 * This file is part of CAMEMIS App.
 *
 * {CAMEMIS App} can not be copied and/or distributed without the express
-* permission of {KAOM Vibolrith, Vikensoft Germany}
+* permission of {KAOM Vibolrith, CAMEMIS Germany}
 * ************************************************************************** */
 namespace StaffApp;
 
-use Zend\Session\Container;
-use Zend\Db\Adapter\Adapter;
 use Zend\Mvc\ModuleRouteListener;
 use Zend\Mvc\MvcEvent;
-use Zend\Db\ResultSet\ResultSet;
 use Zend\View\Model\JsonModel;
-use Zend\Db\TableGateway\TableGateway;
 use StaffApp\Model\Staff;
 use StaffApp\Model\StaffTable;
 
@@ -96,26 +91,10 @@ class Module
     {
         return array(
             'factories' => array(
-                'UserAdapter' => function ($sm) {
-                    $config = $sm->get('config');
-                    $session = new Container();
-                    $dbAdapterConfig = array(
-                        'driver' => $config["db"]["driver"],
-                        'dsn' => "mysql:dbname=" . $session->offsetGet('choose_db_name') . ";host=localhost",
-                        'username' => $config["db"]["username"],
-                        'password' => $config["db"]["password"],
-                    );
-                    return new Adapter($dbAdapterConfig);
-                }, 'StaffApp\Model\StaffTable' => function ($sm) {
-                    $tableGateway = $sm->get('StaffTableGateway');
-                    $table = new StaffTable($tableGateway);
-                    return $table;
-                },
-                'StaffTableGateway' => function ($sm) {
+                'StaffApp\Model\StaffTable' => function($sm) {
                     $dbAdapter = $sm->get('UserAdapter');
-                    $resultSetPrototype = new ResultSet();
-                    $resultSetPrototype->setArrayObjectPrototype(new Staff());
-                    return new TableGateway('t_staff', $dbAdapter, null, $resultSetPrototype);
+                    $table = new StaffTable($dbAdapter);
+                    return $table;
                 },
             )
         );

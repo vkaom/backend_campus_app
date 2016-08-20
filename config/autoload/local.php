@@ -1,13 +1,12 @@
 <?php
-
-/* * ***************************************************************************
- * Copyright (C) 2015 {KAOM Vibolrith} <{vibolrith@gmail.com}>
- * 
- * This file is part of CAMEMIS Learning.
- * 
- * {CAMEMIS Learning} can not be copied and/or distributed without the express
- * permission of {KAOM Vibolrith, Vikensoft Germany}
- * ************************************************************************** */
+/*******************************************************************************
+ * Copyright (C) 2016 {KAOM Vibolrith} <{vibolrith@gmail.com}>
+ *
+ * This file is part of CAMEMIS App.
+ *
+ * {CAMEMIS App} can not be copied and/or distributed without the express
+ * permission of {KAOM Vibolrith, CAMEMIS Germany}
+ ******************************************************************************/
 if ($_SERVER['REMOTE_ADDR'] == "127.0.0.1") {
     $DB_USERNAME = "root";
     $DB_PASSWORD = "";
