@@ -7,14 +7,14 @@
 * {CAMEMIS App} can not be copied and/or distributed without the express
 * permission of {KAOM Vibolrith, CAMEMIS Germany}
 * ************************************************************************** */
-namespace LoginApp;
+namespace MainApp;
 
 use Zend\Session\Container;
 use Zend\Db\Adapter\Adapter;
 use Zend\Mvc\ModuleRouteListener;
 use Zend\Mvc\MvcEvent;
 use Zend\View\Model\JsonModel;
-use LoginApp\Model\LoginTable;
+use MainApp\Model\LoginTable;
 
 use Zend\Di\Di;
 use Zend\Di\Definition;
