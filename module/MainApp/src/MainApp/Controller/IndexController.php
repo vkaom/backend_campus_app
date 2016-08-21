@@ -37,8 +37,8 @@ class IndexController extends AbstractRestfulJsonController
                 $username = isset($data["username"]) ? $data["username"] : "";
                 $password = isset($data["password"]) ? $data["password"] : "";
                 $role = isset($data["role"]) ? $data["role"] : "";
-                if ($this->actionLogin($role, $username, $password)) {
-                    return new JsonModel(array('success' => true, 'data' => $this->actionLogin($role, $username, $password)));
+                if ($this->loginData($role, $username, $password)) {
+                    return new JsonModel(array('success' => true, 'data' => $this->loginData($role, $username, $password)));
                 } else {
                     return new JsonModel(array('success' => false, 'data' => "Not available"));
                 }
@@ -52,7 +52,7 @@ class IndexController extends AbstractRestfulJsonController
      * @param $password
      * @return string
      */
-    protected function actionLogin($role, $username, $password)
+    protected function loginData($role, $username, $password)
     {
         $loginTable = $this->getServiceLocator()->get('LoginTable');
         return $loginTable->getTokenData($role, $username, $password);
@@ -62,10 +62,10 @@ class IndexController extends AbstractRestfulJsonController
      * @param $url
      * @return mixed
      */
-    protected function getSchool($url)
+    protected function getSchoolData($url)
     {
         $SchoolTable = $this->getServiceLocator()->get('SchoolTable');
-        return $SchoolTable->getSchoolByUrl($url);
+        return $SchoolTable->getSchoolData($url);
     }
 
     /**
