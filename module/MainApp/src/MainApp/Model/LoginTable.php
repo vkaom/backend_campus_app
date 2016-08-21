@@ -10,6 +10,7 @@
 
 namespace MainApp\Model;
 
+use Zend\Session\Container;
 use Zend\Db\Adapter\Adapter;
 use Zend\Db\TableGateway\AbstractTableGateway;
 use Zend\Db\Sql\Sql;
@@ -36,6 +37,8 @@ class LoginTable extends AbstractTableGateway
         $facette = $this->getSchoolByUrl($url);
         $data = array();
         if($facette){
+            $session = new Container("User");
+            $session->offsetSet('USER_DB', $facette->DB_NAME);
             $data["name"] = $facette->SCHOOL_NAME;
             $data["phone"] = $facette->CONTACT_PHONE;
             $data["email"] = $facette->CONTACT_EMAIL;

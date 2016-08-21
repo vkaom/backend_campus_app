@@ -67,13 +67,4 @@ class IndexController extends AbstractRestfulJsonController
         $SchoolTable = $this->getServiceLocator()->get('SchoolTable');
         return $SchoolTable->getSchoolData($url);
     }
-
-    /**
-     * @param $mobileUri
-     */
-    protected function setChooseDBName($mobileUri)
-    {
-        $this->getServiceLocator()->get('Session')->offsetSet('USER_DB', $this->getSchool($mobileUri)->DB_NAME);
-    }
-
 }
