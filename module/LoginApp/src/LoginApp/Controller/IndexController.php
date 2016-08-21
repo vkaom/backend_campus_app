@@ -21,15 +21,29 @@ class IndexController extends AbstractRestfulJsonController
      */
     public function create($data)
     {   // Action used for POST requests
+        $action_key = isset($data["action_key"]) ? $data["action_key"] : "";
 
-        $mobileUri = isset($data["url"]) ? $data["url"] : "";
-        $username = isset($data["username"]) ? $data["username"] : "";
-        $password = isset($data["password"]) ? $data["password"] : "";
-        $role = isset($data["role"]) ? $data["role"] : "";
+        switch ($action_key) {
+            case "Pu0QUvj82x":
+                $url = isset($data["url"]) ? $data["url"] : "";
+                if ($this->getSchoolData($url)) {
+                    return new JsonModel(array('success' => true, 'data' => $this->getSchoolData($url)));
+                } else {
+                    return new JsonModel(array('success' => false, 'data' => "Not available"));
+                }
 
-        $this->setChooseDBName($mobileUri);
-        $token = $this->actionLogion($role, $username, $password);
-        return new JsonModel(array('tokenId' => $token));
+                break;
+            case "EnOLNTB1Q":
+                $username = isset($data["username"]) ? $data["username"] : "";
+                $password = isset($data["password"]) ? $data["password"] : "";
+                $role = isset($data["role"]) ? $data["role"] : "";
+                if ($this->actionLogin($role, $username, $password)) {
+                    return new JsonModel(array('success' => true, 'data' => $this->actionLogin($role, $username, $password)));
+                } else {
+                    return new JsonModel(array('success' => false, 'data' => "Not available"));
+                }
+                break;
+        }
     }
 
     /**
@@ -38,52 +52,20 @@ class IndexController extends AbstractRestfulJsonController
      * @param $password
      * @return string
      */
-    protected function actionLogion($role, $username, $password)
+    protected function actionLogin($role, $username, $password)
     {
-        $sql = new Sql($this->getServiceLocator()->get('UserAdapter'));
-        $select = $sql->select();
-        switch ($role) {
-            case 1:
-                $select->from('t_student', array('*'));
-                break;
-            case 2:
-                $select->from('t_member', array('*'));
-                break;
-        }
-
-        $select->where(array('loginname' => $username));
-        $select->where(array('password' => md5($password . "-D99A6718-9D2A-8538-8610-E048177BECD5")));
-        //echo ($sql->getSqlstringForSqlObject($select));
-        $statement = $sql->prepareStatementForSqlObject($select);
-        $resultSet = new ResultSet(ResultSet::TYPE_ARRAY);
-        $output = $resultSet->initialize($statement->execute())->toArray();
-
-        $tokenId = $output ? $output[0]["ID"] : "";
-        $this->getServiceLocator()->get('Session')->offsetSet('tokenId', $tokenId);
-
-        return $tokenId;
+        $loginTable = $this->getServiceLocator()->get('LoginTable');
+        return $loginTable->getTokenData($role, $username, $password);
     }
 
     /**
-     * @param $mobileUri
+     * @param $url
      * @return mixed
      */
-    protected function getUserDB($mobileUri)
+    protected function getSchool($url)
     {
-        $sql = new Sql($this->getServiceLocator()->get('AdminAdapter'));
-        $select = $sql->select();
-        $select->from('t_customer', array('*'));
-        $select->where(array('url' => $mobileUri));
-        $statement = $sql->prepareStatementForSqlObject($select);
-        //echo ($sql->getSqlstringForSqlObject($select));
-        $resultSet = new ResultSet(ResultSet::TYPE_ARRAY);
-        $result = $resultSet->initialize($statement->execute())->toArray();
-
-        if ($result) {
-            return $result[0]["DB_NAME"];
-        } else {
-            die("Error.....");
-        }
+        $SchoolTable = $this->getServiceLocator()->get('SchoolTable');
+        return $SchoolTable->getSchoolByUrl($url);
     }
 
     /**
@@ -91,7 +73,7 @@ class IndexController extends AbstractRestfulJsonController
      */
     protected function setChooseDBName($mobileUri)
     {
-        $this->getServiceLocator()->get('Session')->offsetSet('USER_DB', $this->getUserDB($mobileUri));
+        $this->getServiceLocator()->get('Session')->offsetSet('USER_DB', $this->getSchool($mobileUri)->DB_NAME);
     }
 
 }

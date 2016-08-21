@@ -14,6 +14,7 @@ use Zend\Db\Adapter\Adapter;
 use Zend\Mvc\ModuleRouteListener;
 use Zend\Mvc\MvcEvent;
 use Zend\View\Model\JsonModel;
+use LoginApp\Model\LoginTable;
 
 use Zend\Di\Di;
 use Zend\Di\Definition;
@@ -103,6 +104,9 @@ class Module
                 "UserLogin" => function ($sm) {
                     return $sm->get("Session")->offsetExists('tokenId');
                 },
+                "getTokenId" => function ($sm) {
+                    return $sm->get("Session")->offsetGet('tokenId');
+                },
                 'UserAdapter' => function ($sm) {
                     $config = $sm->get('config');
                     $dbAdapterConfig = array(
@@ -112,7 +116,17 @@ class Module
                         'password' => $config["db"]["password"],
                     );
                     return new Adapter($dbAdapterConfig);
-                }
+                },
+                'SchoolTable' => function ($sm) {
+                    $dbAdapter = $sm->get('AdminAdapter');
+                    $table = new LoginTable($dbAdapter);
+                    return $table;
+                },
+                'LoginTable' => function ($sm) {
+                    $dbAdapter = $sm->get('UserAdapter');
+                    $table = new LoginTable($dbAdapter);
+                    return $table;
+                },
             ),
         );
     }

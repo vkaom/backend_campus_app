@@ -12,7 +12,6 @@ namespace StudentApp;
 use Zend\Mvc\ModuleRouteListener;
 use Zend\Mvc\MvcEvent;
 use Zend\View\Model\JsonModel;
-use StudentApp\Model\Student;
 use StudentApp\Model\StudentTable;
 
 class Module

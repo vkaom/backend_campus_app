@@ -22,32 +22,49 @@ if ($_SERVER['REMOTE_ADDR'] == "127.0.0.1") {
 <script>
     angular.module('myApp', [])
         .controller('myCtrl', function ($scope, $http) {
-            $scope.hello = {name: "Boaz"};
-            $scope.newName = "";
-            $scope.sendPost = function () {
+            $scope.actionCheckSchool = function () {
                 var postdata = {};
                 postdata.url = $scope.url;
-                postdata.role = $scope.role;
-                postdata.username = $scope.username;
-                postdata.password = $scope.password;
+                postdata.action_key = "Pu0QUvj82x";
                 $http.post("http://<?=$REST_URL;?>", postdata, {
                     //headers: {'tokenId': 'Pu0QUvj82xZ15AcO0PTe6L2EnOLNTB1QJaH'}
                 }).success(function (data, status) {
-                    $scope.hello = [];
+                    //
+                });
+            };
+            $scope.actionLogin = function () {
+                var postdata = {};
+                postdata.role = $scope.role;
+                postdata.username = $scope.username;
+                postdata.password = $scope.password;
+                postdata.action_key = "EnOLNTB1Q";
+                $http.post("http://<?=$REST_URL;?>", postdata, {
+                    //headers: {'tokenId': 'Pu0QUvj82xZ15AcO0PTe6L2EnOLNTB1QJaH'}
+                }).success(function (data, status) {
+                    //
                 });
             };
         })
 </script>
 <body ng-app="myApp">
 <div class="container" ng-controller="myCtrl">
-    <h2>Logion</h2>
-    <form class="form-horizontal"  ng-submit="sendPost()" role="form">
+    <h2>Check School</h2>
+    <form class="form-horizontal"  ng-submit="actionCheckSchool()" role="form">
         <div class="form-group">
             <label class="control-label col-sm-2" for="email">School Url:</label>
             <div class="col-sm-10">
                 <input type="text" class="form-control" ng-model="url" placeholder="School Url">
             </div>
         </div>
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+                <button type="submit" class="btn btn-default">Submit</button>
+            </div>
+        </div>
+    </form>
+    <hr>
+    <h2>Logion</h2>
+    <form class="form-horizontal"  ng-submit="actionLogin()" role="form">
         <div class="form-group">
             <label class="control-label col-sm-2" for="pwd">Login-Name:</label>
             <div class="col-sm-10">

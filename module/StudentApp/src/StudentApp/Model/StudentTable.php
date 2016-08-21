@@ -12,6 +12,7 @@ namespace StudentApp\Model;
 
 use Zend\Db\Adapter\Adapter;
 use Zend\Db\TableGateway\AbstractTableGateway;
+use Zend\Db\Sql\Sql;
 use Zend\Db\Sql\Select;
 
 class StudentTable extends AbstractTableGateway
@@ -88,6 +89,7 @@ class StudentTable extends AbstractTableGateway
         return $this->delete(array('id' => (int)$id));
     }
 
+    /*
     public function getCurrentAcademicByStudent($id)
     {
         $sql = new Sql($this->adapter);
@@ -105,6 +107,41 @@ class StudentTable extends AbstractTableGateway
         $result = $statement->execute();
 
         return $result;
+    }
+    */
+
+    public function getStudentAcademic($id)
+    {
+        /*
+        $this->table = "t_student_current_academic";
+        $select = $this->tableGateway->getSql()->select();
+        $select->where(array(
+            'menu_flag' => 'y',
+            'delete_flag' => 'n',
+            'catalog_id' => $subQuery,
+        ));
+        $select->order('level, sort DESC');
+
+        $row = $this->tableGateway->selectWith($select);
+        return $row;
+
+        $sql = new Sql($this->adapter);
+        $select = $sql->select();
+        $select->from("t_student_current_academic");
+        */
+        $sql = new Sql($this->adapter);
+        $maxStartYearSQL = $sql->select();
+        $maxStartYearSQL->from("t_student_schoolyear", array('MAX(START_YEAR)'));
+        $maxEndYearSQL = $sql->select();
+        $maxEndYearSQL->from("t_student_schoolyear", array('MAX(END_YEAR)'));
+        $select = $sql->select();
+        $select->from(array('A' => "t_student_schoolyear"), array('*'));
+        $select->join(array('B' => 't_academicdate'), 'A.SCHOOL_YEAR=B.ID', array("NAME AS SCHOOLYEAR", "NAME_EN AS SCHOOLYEAR_EN"));
+        $select->where(array("A.STUDENT='" . $id . "'"));
+        $select->where(array("A.START_YEAR IN (" . $maxStartYearSQL . ")"));
+        $select->where(array("A.END_YEAR IN (" . $maxEndYearSQL . ")"));
+        //error_log($SQL->__toString());
+        return $this->tableGateway->selectWith($select);
     }
 
 }

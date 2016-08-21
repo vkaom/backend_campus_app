@@ -19,7 +19,7 @@ class StudentController extends AbstractRestfulJsonController
     public function getList()
     {
 
-        print_r($this->getServiceLocator()->get("Session"));
+       echo $this->getServiceLocator()->get("getTokenId");
 
 
         if (!$this->getServiceLocator()->get("UserLogin")) {
@@ -48,7 +48,15 @@ class StudentController extends AbstractRestfulJsonController
         if (!$this->getServiceLocator()->get("UserLogin")) {
             exit();
         }
-        return new JsonModel(array("data" => array('id' => 1, 'Lastname' => 'Kaom', 'Firstname' => 'Sothearos')));
+
+        /*
+
+        $sm = $this->getServiceLocator();
+        $this->studentTable = $sm->get('StudentApp\Model\StudentTable');
+        $this->studentTable->getStudentAcademic($id);
+        */
+
+        return new JsonModel(array("data" => array('id' =>  $this->getServiceLocator()->get("getTokenId"))));
     }
 
     public function create($data)
