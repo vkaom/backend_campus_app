@@ -1,12 +1,12 @@
 <?php
-/*******************************************************************************
- * Copyright (C) 2016 {KAOM Vibolrith} <{vibolrith@gmail.com}>
- *
- * This file is part of CAMEMIS App.
- *
- * {CAMEMIS App} can not be copied and/or distributed without the express
- * permission of {KAOM Vibolrith, CAMEMIS Germany}
- ******************************************************************************/
+/* * ***************************************************************************
+* Copyright (C) 2016 {KAOM Vibolrith} <{vibolrith@gmail.com}>
+*
+* This file is part of CAMEMIS App.
+*
+* {CAMEMIS App} can not be copied and/or distributed without the express
+* permission of {KAOM Vibolrith, CAMEMIS Germany}
+* ************************************************************************** */
 
 namespace StaffApp\Model;
 
@@ -17,7 +17,7 @@ use Zend\Db\Sql\Select;
 class StaffTable extends AbstractTableGateway
 {
 
-    protected $table = 't_members';
+    protected $table = 't_student';
 
     public function __construct(Adapter $adapter)
     {
@@ -31,10 +31,12 @@ class StaffTable extends AbstractTableGateway
         });
         $entities = array();
         foreach ($resultSet as $row) {
-            $entity = new Entity\Staff();
-            $entity->setId($row->id)
-                ->setLastname($row->lastname)
-                ->setFirstname($row->firstname);
+            $entity = new Staff();
+            $entity->setId($row->ID);
+            $entity->setGender($row->GENDER);
+            $entity->getLastname($row->LASTNAME);
+            $entity->setFirstname($row->FIRSTNAME);
+            $entity->setPhone($row->PHONE);
             $entities[] = $entity;
         }
         return $entities;
@@ -42,23 +44,28 @@ class StaffTable extends AbstractTableGateway
 
     public function getStaff($id)
     {
-        $row = $this->select(array('id' => (int)$id))->current();
+        $row = $this->select(array('ID' => $id));
         if (!$row)
             return false;
 
-        $staff = new Entity\Staff(array(
-            'id' => $row->id,
-            'lastname' => $row->lastname,
-            'firstname' => $row->firstname,
+        $student = new Staff(array(
+            'ID' => $row->ID,
+            'LASTNAME' => $row->LASTNAME,
+            'FIRSTNAME' => $row->FIRSTNAME,
+            'FIRSTNAME_LATIN' => $row->FIRSTNAME_LATIN,
+            'LASTNAME_LATIN' => $row->LASTNAME_LATIN,
+            'DATE_BIRTH' => $row->DATE_BIRTH,
+            'EMAIL' => $row->EMAIL,
+            'PHONE' => $row->PHONE,
         ));
-        return $staff;
+        return $student;
     }
 
-    public function saveStudent(Entity\Staff $staff)
+    public function saveStudent(Staff $staff)
     {
         $data = array(
-            'lastname' => $staff->getLastname(),
-            'firstname' => $staff->getFirstname(),
+            'LASTNAME' => $staff->getLastname(),
+            'FIRSTNAME' => $staff->getFirstname(),
         );
 
         $id = (int)$staff->getId();

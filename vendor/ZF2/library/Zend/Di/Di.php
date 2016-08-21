@@ -3,7 +3,7 @@
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2013 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -40,13 +40,6 @@ class Di implements DependencyInjectionInterface
      * @var array
      */
     protected $currentDependencies = array();
-
-    /**
-     * All the dependenent aliases
-     *
-     * @var array
-     */
-    protected $currentAliasDependenencies = array();
 
     /**
      * All the class references [dependency][source]
@@ -172,21 +165,6 @@ class Di implements DependencyInjectionInterface
     public function instanceManager()
     {
         return $this->instanceManager;
-    }
-
-    /**
-     * Utility method used to retrieve the class of a particular instance. This is here to allow extending classes to
-     * override how class names are resolved
-     *
-     * @internal this method is used by the ServiceLocator\DependencyInjectorProxy class to interact with instances
-     *           and is a hack to be used internally until a major refactor does not split the `resolveMethodParameters`. Do not
-     *           rely on its functionality.
-     * @param  Object $instance
-     * @return string
-     */
-    protected function getClass($instance)
-    {
-        return get_class($instance);
     }
 
     /**
@@ -566,7 +544,7 @@ class Di implements DependencyInjectionInterface
      * @param  string                                $method
      * @param  array                                 $callTimeUserParams
      * @param  string                                $alias
-     * @param  int|bool                              $methodRequirementType
+     * @param  int|bolean                            $methodRequirementType
      * @param  bool                                  $isInstantiator
      * @throws Exception\MissingPropertyException
      * @throws Exception\CircularDependencyException
@@ -622,17 +600,6 @@ class Di implements DependencyInjectionInterface
 
         if ($requestedClass != $class && $this->instanceManager->hasConfig($requestedClass)) {
             $iConfig['requestedClass'] = $this->instanceManager->getConfig($requestedClass);
-
-            if (array_key_exists('parameters', $iConfig['requestedClass'])) {
-                $newParameters = array();
-
-                foreach ($iConfig['requestedClass']['parameters'] as $name=>$parameter) {
-                    $newParameters[$requestedClass.'::'.$method.'::'.$name] = $parameter;
-                }
-
-                $iConfig['requestedClass']['parameters'] = $newParameters;
-            }
-
             if ($requestedAlias) {
                 $iConfig['requestedAlias'] = $this->instanceManager->getConfig($requestedAlias);
             }
@@ -789,21 +756,13 @@ class Di implements DependencyInjectionInterface
                 $resolvedParams[$index] = $computedParams['value'][$fqParamPos];
             } elseif (isset($computedParams['retrieval'][$fqParamPos])) {
                 // detect circular dependencies! (they can only happen in instantiators)
-                if ($isInstantiator && in_array($computedParams['retrieval'][$fqParamPos][1], $this->currentDependencies)
-                    && (!isset($alias) || in_array($computedParams['retrieval'][$fqParamPos][0], $this->currentAliasDependenencies))
-                ) {
-                    $msg = "Circular dependency detected: $class depends on {$value[1]} and viceversa";
-                    if (isset($alias)) {
-                        $msg .= " (Aliased as $alias)";
-                    }
-                    throw new Exception\CircularDependencyException($msg);
+                if ($isInstantiator && in_array($computedParams['retrieval'][$fqParamPos][1], $this->currentDependencies)) {
+                    throw new Exception\CircularDependencyException(
+                        "Circular dependency detected: $class depends on {$value[1]} and viceversa"
+                    );
                 }
 
                 array_push($this->currentDependencies, $class);
-                if(isset($alias)) {
-                    array_push($this->currentAliasDependenencies, $alias);
-                }
-
                 $dConfig = $this->instanceManager->getConfig($computedParams['retrieval'][$fqParamPos][0]);
 
                 try {
@@ -816,9 +775,6 @@ class Di implements DependencyInjectionInterface
                     if ($methodRequirementType & self::RESOLVE_STRICT) {
                         //finally ( be aware to do at the end of flow)
                         array_pop($this->currentDependencies);
-                        if(isset($alias)) {
-                            array_pop($this->currentAliasDependenencies);
-                        }
                         // if this item was marked strict,
                         // plus it cannot be resolve, and no value exist, bail out
                         throw new Exception\MissingPropertyException(sprintf(
@@ -830,9 +786,6 @@ class Di implements DependencyInjectionInterface
                     } else {
                         //finally ( be aware to do at the end of flow)
                         array_pop($this->currentDependencies);
-                        if(isset($alias)) {
-                            array_pop($this->currentAliasDependenencies);
-                        }
                         return false;
                     }
                 } catch (ServiceManagerException $e) {
@@ -840,9 +793,6 @@ class Di implements DependencyInjectionInterface
                     if ($methodRequirementType & self::RESOLVE_STRICT) {
                         //finally ( be aware to do at the end of flow)
                         array_pop($this->currentDependencies);
-                        if(isset($alias)) {
-                            array_pop($this->currentAliasDependenencies);
-                        }
                         // if this item was marked strict,
                         // plus it cannot be resolve, and no value exist, bail out
                         throw new Exception\MissingPropertyException(sprintf(
@@ -854,16 +804,10 @@ class Di implements DependencyInjectionInterface
                     } else {
                         //finally ( be aware to do at the end of flow)
                         array_pop($this->currentDependencies);
-                        if(isset($alias)) {
-                            array_pop($this->currentAliasDependenencies);
-                        }
                         return false;
                     }
                 }
                 array_pop($this->currentDependencies);
-                if(isset($alias)) {
-                    array_pop($this->currentAliasDependenencies);
-                }
             } elseif (!array_key_exists($fqParamPos, $computedParams['optional'])) {
                 if ($methodRequirementType & self::RESOLVE_STRICT) {
                     // if this item was not marked as optional,
@@ -886,6 +830,21 @@ class Di implements DependencyInjectionInterface
     }
 
     /**
+     * Utility method used to retrieve the class of a particular instance. This is here to allow extending classes to
+     * override how class names are resolved
+     *
+     * @internal this method is used by the ServiceLocator\DependencyInjectorProxy class to interact with instances
+     *           and is a hack to be used internally until a major refactor does not split the `resolveMethodParameters`. Do not
+     *           rely on its functionality.
+     * @param  Object $instance
+     * @return string
+     */
+    protected function getClass($instance)
+    {
+        return get_class($instance);
+    }
+
+    /**
      * Checks if the object has this class as one of its parents
      *
      * @see https://bugs.php.net/bug.php?id=53727
@@ -900,7 +859,7 @@ class Di implements DependencyInjectionInterface
         if (is_subclass_of($className, $type)) {
             return true;
         }
-        if (PHP_VERSION_ID >= 50307) {
+        if (version_compare(PHP_VERSION, '5.3.7', '>=')) {
             return false;
         }
         if (!interface_exists($type)) {

@@ -3,7 +3,7 @@
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2013 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -205,10 +205,6 @@ class Client implements Stdlib\DispatchableInterface
      */
     public function getAdapter()
     {
-        if (! $this->adapter) {
-            $this->setAdapter($this->config['adapter']);
-        }
-
         return $this->adapter;
     }
 
@@ -816,7 +812,10 @@ class Client implements Stdlib\DispatchableInterface
         $this->redirectCounter = 0;
         $response = null;
 
-        $adapter = $this->getAdapter();
+        // Make sure the adapter is loaded
+        if ($this->adapter == null) {
+            $this->setAdapter($this->config['adapter']);
+        }
 
         // Send the first request. If redirected, continue.
         do {
@@ -869,7 +868,7 @@ class Client implements Stdlib\DispatchableInterface
             }
 
             // check that adapter supports streaming before using it
-            if (is_resource($body) && !($adapter instanceof Client\Adapter\StreamInterface)) {
+            if (is_resource($body) && !($this->adapter instanceof Client\Adapter\StreamInterface)) {
                 throw new Client\Exception\RuntimeException('Adapter does not support streaming');
             }
 
@@ -897,7 +896,7 @@ class Client implements Stdlib\DispatchableInterface
                     rewind($stream);
                 }
                 // cleanup the adapter
-                $adapter->setOutputStream(null);
+                $this->adapter->setOutputStream(null);
                 $response = Response\Stream::fromStream($response, $stream);
                 $response->setStreamName($this->streamName);
                 if (!is_string($this->config['outputstream'])) {
@@ -905,7 +904,7 @@ class Client implements Stdlib\DispatchableInterface
                     $response->setCleanup(true);
                 }
             } else {
-                $response = $this->getResponse()->fromString($response);
+                $response = Response::fromString($response);
             }
 
             // Get the cookies from response (if any)
@@ -1154,10 +1153,9 @@ class Client implements Stdlib\DispatchableInterface
         }
 
         // Merge the headers of the request (if any)
-        // here we need right 'http field' and not lowercase letters
-        $requestHeaders = $this->getRequest()->getHeaders();
-        foreach ($requestHeaders as $requestHeaderElement) {
-            $headers[$requestHeaderElement->getFieldName()] = $requestHeaderElement->getFieldValue();
+        $requestHeaders = $this->getRequest()->getHeaders()->toArray();
+        foreach ($requestHeaders as $key => $value) {
+            $headers[$key] = $value;
         }
         return $headers;
     }

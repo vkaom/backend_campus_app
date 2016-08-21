@@ -44,7 +44,7 @@ class StudentTable extends AbstractTableGateway
 
     public function getStudent($id)
     {
-        $row = $this->select(array('id' => (int)$id))->current();
+        $row = $this->select(array('ID' => $id));
         if (!$row)
             return false;
 
@@ -52,6 +52,11 @@ class StudentTable extends AbstractTableGateway
             'ID' => $row->ID,
             'LASTNAME' => $row->LASTNAME,
             'FIRSTNAME' => $row->FIRSTNAME,
+            'FIRSTNAME_LATIN' => $row->FIRSTNAME_LATIN,
+            'LASTNAME_LATIN' => $row->LASTNAME_LATIN,
+            'DATE_BIRTH' => $row->DATE_BIRTH,
+            'EMAIL' => $row->EMAIL,
+            'PHONE' => $row->PHONE,
         ));
         return $student;
     }
@@ -81,6 +86,25 @@ class StudentTable extends AbstractTableGateway
     public function removeStudent($id)
     {
         return $this->delete(array('id' => (int)$id));
+    }
+
+    public function getCurrentAcademicByStudent($id)
+    {
+        $sql = new Sql($this->adapter);
+        $select = $sql->select();
+        $select->from($this->table)
+            ->join('t_student_schoolyear', 'tracks.album_id = album.id');
+
+        $where = new  Where();
+        $where->equalTo('album_id', $id);
+        $select->where($where);
+
+        //you can check your query by echo-ing :
+        // echo $select->getSqlString();
+        $statement = $sql->prepareStatementForSqlObject($select);
+        $result = $statement->execute();
+
+        return $result;
     }
 
 }

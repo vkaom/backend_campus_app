@@ -16,8 +16,16 @@ class Student
     protected $ID;
     protected $FIRSTNAME;
     protected $LASTNAME;
+    protected $FIRSTNAME_LATIN;
+    protected $LASTNAME_LATIN;
     protected $GENDER;
     protected $PHONE;
+    protected $EMAIL;
+    protected $CAMPUS;
+    protected $GRADE;
+    protected $SCHOOLYEAR;
+    protected $CLASSROOM;
+    protected $SUBJECT;
 
     public function __construct(array $options = null)
     {
@@ -104,6 +112,86 @@ class Student
     public function getPhone()
     {
         return $this->PHONE;
+    }
+
+    public function setLastnameLatin($v)
+    {
+        $this->LASTNAME_LATIN = $v;
+    }
+
+    public function getLastnameLatin()
+    {
+        return $this->LASTNAME_LATIN;
+    }
+
+    public function setFistnameLatin($v)
+    {
+        $this->FIRSTNAME_LATIN = $v;
+    }
+
+    public function getFirstnameLatin()
+    {
+        return $this->FIRSTNAME_LATIN;
+    }
+
+    public function setEmail($v)
+    {
+        $this->EMAIL = $v;
+    }
+
+    public function getEmail()
+    {
+        return $this->EMAIL;
+    }
+
+    public function setCampus($v)
+    {
+        $this->CAMPUS = $v;
+    }
+
+    public function getCampus()
+    {
+        return $this->CAMPUS;
+    }
+
+    public function setGrade($v)
+    {
+        $this->GRADE = $v;
+    }
+
+    public function getGrade()
+    {
+        return $this->GRADE;
+    }
+
+    public function setSchoolyear($v)
+    {
+        $this->SCHOOLYEAR = $v;
+    }
+
+    public function getSchoolyear()
+    {
+        return $this->SCHOOLYEAR;
+    }
+
+    public function setClassroom($v)
+    {
+        $this->CLASSROOM = $v;
+    }
+
+    public function getClassroom()
+    {
+        return $this->CLASSROOM;
+    }
+
+    public function setSubject($v)
+    {
+        $this->SUBJECT = $v;
+    }
+
+    public function getSubject()
+    {
+        return $this->SUBJECT;
     }
 
 }

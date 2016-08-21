@@ -98,7 +98,7 @@ class Module
         return array(
             'factories' => array(
                 "Session" => function () {
-                    return new Container();
+                    return new Container("User");
                 },
                 "UserLogin" => function ($sm) {
                     return $sm->get("Session")->offsetExists('tokenId');

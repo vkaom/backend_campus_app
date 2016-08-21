@@ -3,19 +3,17 @@
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2013 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
 namespace Zend\InputFilter;
 
 use Traversable;
-use Zend\Filter\Exception;
 use Zend\Filter\FilterChain;
 use Zend\Stdlib\ArrayUtils;
 use Zend\Validator\ValidatorInterface;
 use Zend\Validator\ValidatorChain;
-use Zend\ServiceManager\ServiceLocatorInterface;
 
 class Factory
 {
@@ -39,12 +37,12 @@ class Factory
      */
     public function __construct(InputFilterPluginManager $inputFilterManager = null)
     {
-        $this->defaultFilterChain    = new FilterChain();
-        $this->defaultValidatorChain = new ValidatorChain();
-
         if ($inputFilterManager) {
             $this->setInputFilterManager($inputFilterManager);
         }
+
+        $this->defaultFilterChain    = new FilterChain();
+        $this->defaultValidatorChain = new ValidatorChain();
     }
 
     /**
@@ -118,15 +116,7 @@ class Factory
     public function setInputFilterManager(InputFilterPluginManager $inputFilterManager)
     {
         $this->inputFilterManager = $inputFilterManager;
-        $serviceLocator = $this->inputFilterManager->getServiceLocator();
-        if ($serviceLocator && $serviceLocator instanceof ServiceLocatorInterface) {
-            if ($serviceLocator->has('ValidatorManager')) {
-                $this->getDefaultValidatorChain()->setPluginManager($serviceLocator->get('ValidatorManager'));
-            }
-            if ($serviceLocator->has('FilterManager')) {
-                $this->getDefaultFilterChain()->setPluginManager($serviceLocator->get('FilterManager'));
-            }
-        }
+
         return $this;
     }
 
@@ -226,9 +216,6 @@ class Factory
                 case 'fallback_value':
                     $input->setFallbackValue($value);
                     break;
-                case 'break_on_failure':
-                    $input->setBreakOnFailure($value);
-                    break;
                 case 'filters':
                     if ($value instanceof FilterChain) {
                         $input->setFilterChain($value);
@@ -304,16 +291,10 @@ class Factory
             if (isset($inputFilterSpecification['count'])) {
                 $inputFilter->setCount($inputFilterSpecification['count']);
             }
-            if (isset($inputFilterSpecification['required'])) {
-                $inputFilter->setIsRequired($inputFilterSpecification['required']);
-            }
             return $inputFilter;
         }
 
         foreach ($inputFilterSpecification as $key => $value) {
-            if (null === $value) {
-                continue;
-            }
 
             if (($value instanceof InputInterface)
                 || ($value instanceof InputFilterInterface)
@@ -332,7 +313,6 @@ class Factory
     /**
      * @param  FilterChain       $chain
      * @param  array|Traversable $filters
-     * @throws Exception\RuntimeException
      * @return void
      */
     protected function populateFilters(FilterChain $chain, $filters)
@@ -368,7 +348,6 @@ class Factory
     /**
      * @param  ValidatorChain    $chain
      * @param  array|Traversable $validators
-     * @throws Exception\RuntimeException
      * @return void
      */
     protected function populateValidators(ValidatorChain $chain, $validators)

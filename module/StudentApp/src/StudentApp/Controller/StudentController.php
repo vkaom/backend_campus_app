@@ -18,13 +18,17 @@ class StudentController extends AbstractRestfulJsonController
 {
     public function getList()
     {
+
+        print_r($this->getServiceLocator()->get("Session"));
+
+
         if (!$this->getServiceLocator()->get("UserLogin")) {
             exit();
         }
 
         $sm = $this->getServiceLocator();
         $this->studentTable = $sm->get('StudentApp\Model\StudentTable');
-        var_dump($this->studentTable->fetchAll());
+        //var_dump($this->studentTable->fetchAll());
 
         $data = array();
 

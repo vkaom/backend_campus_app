@@ -3,7 +3,7 @@
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2013 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -101,7 +101,7 @@ class ClassGenerator extends AbstractGenerator
         }
 
         $interfaceNames = array();
-        foreach ($interfaces as $interface) {
+        foreach ($interfaces AS $interface) {
             /* @var \Zend\Code\Reflection\ClassReflection $interface */
             $interfaceNames[] = $interface->getName();
         }
@@ -118,8 +118,7 @@ class ClassGenerator extends AbstractGenerator
 
         $methods = array();
         foreach ($classReflection->getMethods() as $reflectionMethod) {
-            $className = ($cg->getNamespaceName())? $cg->getNamespaceName() . "\\" . $cg->getName() : $cg->getName();
-            if ($reflectionMethod->getDeclaringClass()->getName() == $className) {
+            if ($reflectionMethod->getDeclaringClass()->getName() == $cg->getNamespaceName() . "\\" . $cg->getName()) {
                 $methods[] = MethodGenerator::fromReflection($reflectionMethod);
             }
         }
@@ -198,16 +197,9 @@ class ClassGenerator extends AbstractGenerator
      * @param  array $methods
      * @param  DocBlockGenerator $docBlock
      */
-    public function __construct(
-        $name = null,
-        $namespaceName = null,
-        $flags = null,
-        $extends = null,
-        $interfaces = array(),
-        $properties = array(),
-        $methods = array(),
-        $docBlock = null
-    ) {
+    public function __construct($name = null, $namespaceName = null, $flags = null, $extends = null,
+                                $interfaces = array(), $properties = array(), $methods = array(), $docBlock = null)
+    {
         if ($name !== null) {
             $this->setName($name);
         }
@@ -466,7 +458,7 @@ class ClassGenerator extends AbstractGenerator
     /**
      * Add property from PropertyGenerator
      *
-     * @param  PropertyGenerator           $property
+     * @param  string|PropertyGenerator           $property
      * @throws Exception\InvalidArgumentException
      * @return ClassGenerator
      */
@@ -498,7 +490,7 @@ class ClassGenerator extends AbstractGenerator
             $use .= ' as ' . $useAlias;
         }
 
-        $this->uses[$use] = $use;
+        $this->uses[] = $use;
         return $this;
     }
 
@@ -532,7 +524,7 @@ class ClassGenerator extends AbstractGenerator
      */
     public function getUses()
     {
-        return array_values($this->uses);
+        return $this->uses;
     }
 
     /**
@@ -576,13 +568,9 @@ class ClassGenerator extends AbstractGenerator
      * @throws Exception\InvalidArgumentException
      * @return ClassGenerator
      */
-    public function addMethod(
-        $name = null,
-        array $parameters = array(),
-        $flags = MethodGenerator::FLAG_PUBLIC,
-        $body = null,
-        $docBlock = null
-    ) {
+    public function addMethod($name = null, array $parameters = array(), $flags = MethodGenerator::FLAG_PUBLIC,
+                              $body = null, $docBlock = null)
+    {
         if (!is_string($name)) {
             throw new Exception\InvalidArgumentException(sprintf(
                 '%s expects string for name',
@@ -604,14 +592,14 @@ class ClassGenerator extends AbstractGenerator
     {
         $methodName = $method->getName();
 
-        if ($this->hasMethod($methodName)) {
+        if (isset($this->methods[$methodName])) {
             throw new Exception\InvalidArgumentException(sprintf(
                 'A method by name %s already exists in this class.',
                 $methodName
             ));
         }
 
-        $this->methods[strtolower($methodName)] = $method;
+        $this->methods[$methodName] = $method;
         return $this;
     }
 
@@ -629,7 +617,13 @@ class ClassGenerator extends AbstractGenerator
      */
     public function getMethod($methodName)
     {
-        return $this->hasMethod($methodName) ? $this->methods[strtolower($methodName)] : false;
+        foreach ($this->methods as $method) {
+            if ($method->getName() == $methodName) {
+                return $method;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -638,8 +632,11 @@ class ClassGenerator extends AbstractGenerator
      */
     public function removeMethod($methodName)
     {
-        if ($this->hasMethod($methodName)) {
-            unset($this->methods[strtolower($methodName)]);
+        foreach ($this->methods as $key => $method) {
+            if ($method->getName() == $methodName) {
+                unset($this->methods[$key]);
+                break;
+            }
         }
 
         return $this;
@@ -651,7 +648,7 @@ class ClassGenerator extends AbstractGenerator
      */
     public function hasMethod($methodName)
     {
-        return isset($this->methods[strtolower($methodName)]);
+        return isset($this->methods[$methodName]);
     }
 
     /**

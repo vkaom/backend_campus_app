@@ -1,21 +1,26 @@
 <?php
-/*******************************************************************************
- * Copyright (C) 2016 {KAOM Vibolrith} <{vibolrith@gmail.com}>
- *
- * This file is part of CAMEMIS App.
- *
- * {CAMEMIS App} can not be copied and/or distributed without the express
- * permission of {KAOM Vibolrith, CAMEMIS Germany}
- ******************************************************************************/
+/* * ***************************************************************************
+* Copyright (C) 2016 {KAOM Vibolrith} <{vibolrith@gmail.com}>
+*
+* This file is part of CAMEMIS App.
+*
+* {CAMEMIS App} can not be copied and/or distributed without the express
+* permission of {KAOM Vibolrith, CAMEMIS Germany}
+* ************************************************************************** */
 
 namespace StaffApp\Model;
 
 class Staff
 {
 
-    protected $_id;
-    protected $_firstname;
-    protected $_lastname;
+    protected $ID;
+    protected $FIRSTNAME;
+    protected $LASTNAME;
+    protected $FIRSTNAME_LATIN;
+    protected $LASTNAME_LATIN;
+    protected $GENDER;
+    protected $PHONE;
+    protected $EMAIL;
 
     public function __construct(array $options = null)
     {
@@ -56,35 +61,81 @@ class Staff
 
     public function getId()
     {
-        return $this->_id;
+        return $this->ID;
     }
 
-    public function setId($id)
+    public function setId($v)
     {
-        $this->_id = $id;
-        return $this;
+        $this->ID = $v;
     }
 
     public function getFirstname()
     {
-        return $this->_firstname;
+        return $this->FIRSTNAME;
     }
 
-    public function setFirstname($firstname)
+    public function setFirstname($v)
     {
-        $this->_firstname = $firstname;
-        return $this;
+        $this->FIRSTNAME = $v;
     }
 
     public function getLastname()
     {
-        return $this->_lastname;
+        return $this->LASTNAME;
     }
 
-    public function setLastname($lastname)
+    public function getGender()
     {
-        $this->_lastname = $lastname;
-        return $this;
+        return $this->GENDER;
     }
 
+    public function setGender($v)
+    {
+        $this->GENDER = $v;
+    }
+
+    public function setLastname($v)
+    {
+        $this->LASTNAME = $v;
+    }
+
+    public function setPhone($v)
+    {
+        $this->PHONE = $v;
+    }
+
+    public function getPhone()
+    {
+        return $this->PHONE;
+    }
+
+    public function setLastnameLatin($v)
+    {
+        $this->LASTNAME_LATIN = $v;
+    }
+
+    public function getLastnameLatin()
+    {
+        return $this->LASTNAME_LATIN;
+    }
+
+    public function setFistnameLatin($v)
+    {
+        $this->FIRSTNAME_LATIN = $v;
+    }
+
+    public function getFirstnameLatin()
+    {
+        return $this->FIRSTNAME_LATIN;
+    }
+
+    public function setEmail($v)
+    {
+        $this->EMAIL = $v;
+    }
+
+    public function getEmail()
+    {
+        return $this->EMAIL;
+    }
 }

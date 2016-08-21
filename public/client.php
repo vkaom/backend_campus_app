@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html lang="en-US">
 
+<?
+if ($_SERVER['REMOTE_ADDR'] == "127.0.0.1") {
+    $REST_URL = "mobile.camemis.home";
+} else {
+    $REST_URL = "mobile.camemis.de";
+}
+?>
+
 <head>
     <title>Bootstrap Example</title>
     <meta charset="utf-8">
@@ -22,8 +30,8 @@
                 postdata.role = $scope.role;
                 postdata.username = $scope.username;
                 postdata.password = $scope.password;
-                $http.post("http://mobile.camemis.home", postdata, {
-                    headers: {'tokenId': 'Pu0QUvj82xZ15AcO0PTe6L2EnOLNTB1QJaH'}
+                $http.post("http://<?=$REST_URL;?>", postdata, {
+                    //headers: {'tokenId': 'Pu0QUvj82xZ15AcO0PTe6L2EnOLNTB1QJaH'}
                 }).success(function (data, status) {
                     $scope.hello = [];
                 });

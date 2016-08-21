@@ -3,7 +3,7 @@
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2013 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -11,13 +11,13 @@ namespace Zend\Form;
 
 use Traversable;
 use Zend\Form\Element\Collection;
+use Zend\Form\Exception;
 use Zend\InputFilter\CollectionInputFilter;
 use Zend\InputFilter\InputFilter;
 use Zend\InputFilter\InputFilterAwareInterface;
 use Zend\InputFilter\InputFilterInterface;
 use Zend\InputFilter\InputFilterProviderInterface;
 use Zend\InputFilter\InputProviderInterface;
-use Zend\InputFilter\ReplaceableInputInterface;
 use Zend\Stdlib\ArrayUtils;
 use Zend\Stdlib\Hydrator\HydratorInterface;
 
@@ -106,14 +106,7 @@ class Form extends Fieldset implements FormInterface
      *
      * @var bool
      */
-    protected $preferFormInputFilter = true;
-
-    /**
-     * Has preferFormInputFilter been set with setPreferFormInputFilter?
-     *
-     * @var bool
-     */
-    protected $hasSetPreferFormInputFilter = false;
+    protected $preferFormInputFilter = false;
 
     /**
      * Are the form elements/fieldsets wrapped by the form name ?
@@ -128,30 +121,6 @@ class Form extends Fieldset implements FormInterface
      * @var null|array
      */
     protected $validationGroup;
-
-
-    /**
-     * Set options for a form. Accepted options are:
-     * - prefer_form_input_filter: is form input filter is preferred?
-     *
-     * @param  array|Traversable $options
-     * @return Element|ElementInterface
-     * @throws Exception\InvalidArgumentException
-     */
-    public function setOptions($options)
-    {
-        parent::setOptions($options);
-
-        if (isset($options['prefer_form_input_filter'])) {
-            $this->setPreferFormInputFilter($options['prefer_form_input_filter']);
-        }
-
-        if (isset($options['use_input_filter_defaults'])) {
-            $this->setUseInputFilterDefaults($options['use_input_filter_defaults']);
-        }
-
-        return $this;
-    }
 
     /**
      * Add an element or fieldset
@@ -634,12 +603,12 @@ class Form extends Fieldset implements FormInterface
                 }
 
                 $value = $values;
+            } else {
+                if (!isset($data[$key])) {
+                    $data[$key] = array();
+                }
+                $this->prepareValidationGroup($fieldset, $data[$key], $validationGroup[$key]);
             }
-
-            if (!isset($data[$key])) {
-                $data[$key] = array();
-            }
-            $this->prepareValidationGroup($fieldset, $data[$key], $validationGroup[$key]);
         }
     }
 
@@ -654,11 +623,6 @@ class Form extends Fieldset implements FormInterface
         $this->hasValidated                = false;
         $this->hasAddedInputFilterDefaults = false;
         $this->filter                      = $inputFilter;
-
-        if (false === $this->hasSetPreferFormInputFilter) {
-            $this->preferFormInputFilter = false;
-        }
-
         return $this;
     }
 
@@ -728,7 +692,6 @@ class Form extends Fieldset implements FormInterface
     public function setPreferFormInputFilter($preferFormInputFilter)
     {
         $this->preferFormInputFilter = (bool) $preferFormInputFilter;
-        $this->hasSetPreferFormInputFilter = true;
         return $this;
     }
 
@@ -754,13 +717,20 @@ class Form extends Fieldset implements FormInterface
         $formFactory  = $this->getFormFactory();
         $inputFactory = $formFactory->getInputFilterFactory();
 
+        if ($fieldset === $this && $fieldset instanceof InputFilterProviderInterface) {
+            foreach ($fieldset->getInputFilterSpecification() as $name => $spec) {
+                $input = $inputFactory->createInput($spec);
+                $inputFilter->add($input, $name);
+            }
+        }
+
         if ($fieldset instanceof Collection && $fieldset->getTargetElement() instanceof FieldsetInterface) {
             $elements = $fieldset->getTargetElement()->getElements();
         } else {
             $elements = $fieldset->getElements();
         }
 
-        if (!$fieldset instanceof Collection || !$fieldset->getTargetElement() instanceof FieldsetInterface || $inputFilter instanceof CollectionInputFilter) {
+        if (!$fieldset instanceof Collection || $inputFilter instanceof CollectionInputFilter) {
             foreach ($elements as $element) {
                 $name = $element->getName();
 
@@ -773,28 +743,14 @@ class Form extends Fieldset implements FormInterface
                         continue;
                     }
                     // Create a new empty default input for this element
-                    $spec  = array('name' => $name, 'required' => false);
-                    $input = $inputFactory->createInput($spec);
+                    $spec = array('name' => $name, 'required' => false);
                 } else {
                     // Create an input based on the specification returned from the element
                     $spec  = $element->getInputSpecification();
-                    $input = $inputFactory->createInput($spec);
-
-                    if ($inputFilter->has($name) && $inputFilter instanceof ReplaceableInputInterface) {
-                        $input->merge($inputFilter->get($name));
-                        $inputFilter->replace($input, $name);
-                        continue;
-                    }
                 }
 
+                $input = $inputFactory->createInput($spec);
                 $inputFilter->add($input, $name);
-            }
-
-            if ($fieldset === $this && $fieldset instanceof InputFilterProviderInterface) {
-                foreach ($fieldset->getInputFilterSpecification() as $name => $spec) {
-                    $input = $inputFactory->createInput($spec);
-                    $inputFilter->add($input, $name);
-                }
             }
         }
 

@@ -1,10 +1,9 @@
 <?php
-
 /**
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2013 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -24,19 +23,21 @@ use Zend\Session\Container;
  * <code>
  * return array(
  *     'session_containers' => array(
- *         'SessionContainer\sample',
- *         'my_sample_session_container',
- *         'MySessionContainer',
+ *         'auth',
+ *         'user',
+ *         'captcha',
  *     ),
  * );
  * </code>
  *
+ * Services use the prefix "SessionContainer\\":
+ *
  * <code>
- * $container = $services->get('MySessionContainer');
+ * $container = $services->get('SessionContainer\captcha');
  * </code>
  */
-class ContainerAbstractServiceFactory implements AbstractFactoryInterface {
-
+class ContainerAbstractServiceFactory implements AbstractFactoryInterface
+{
     /**
      * Cached container configuration
      *
@@ -62,7 +63,8 @@ class ContainerAbstractServiceFactory implements AbstractFactoryInterface {
      * @param  string                  $requestedName
      * @return bool
      */
-    public function canCreateServiceWithName(ServiceLocatorInterface $services, $name, $requestedName) {
+    public function canCreateServiceWithName(ServiceLocatorInterface $services, $name, $requestedName)
+    {
         $config = $this->getConfig($services);
         if (empty($config)) {
             return false;
@@ -78,7 +80,8 @@ class ContainerAbstractServiceFactory implements AbstractFactoryInterface {
      * @param  string                  $requestedName
      * @return Container
      */
-    public function createServiceWithName(ServiceLocatorInterface $services, $name, $requestedName) {
+    public function createServiceWithName(ServiceLocatorInterface $services, $name, $requestedName)
+    {
         $manager = $this->getSessionManager($services);
         return new Container($requestedName, $manager);
     }
@@ -89,7 +92,8 @@ class ContainerAbstractServiceFactory implements AbstractFactoryInterface {
      * @param  ServiceLocatorInterface $services
      * @return false|array
      */
-    protected function getConfig(ServiceLocatorInterface $services) {
+    protected function getConfig(ServiceLocatorInterface $services)
+    {
         if (null !== $this->config) {
             return $this->config;
         }
@@ -119,7 +123,8 @@ class ContainerAbstractServiceFactory implements AbstractFactoryInterface {
      * @param  ServiceLocatorInterface $services
      * @return null|\Zend\Session\ManagerInterface
      */
-    protected function getSessionManager(ServiceLocatorInterface $services) {
+    protected function getSessionManager(ServiceLocatorInterface $services)
+    {
         if ($this->sessionManager !== null) {
             return $this->sessionManager;
         }
@@ -134,11 +139,13 @@ class ContainerAbstractServiceFactory implements AbstractFactoryInterface {
     /**
      * Normalize the container name in order to perform a lookup
      *
+     * Strips off the "SessionContainer\" prefix, and lowercases the name.
+     *
      * @param  string $name
      * @return string
      */
-    protected function normalizeContainerName($name) {
+    protected function normalizeContainerName($name)
+    {
         return strtolower($name);
     }
-
 }
