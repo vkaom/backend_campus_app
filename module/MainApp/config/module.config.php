@@ -15,7 +15,7 @@ return array(
                 'options' => array(
                     'route' => '/',
                     'defaults' => array(
-                        'controller' => 'LoginApp\Controller\Index',
+                        'controller' => 'MainApp\Controller\Index',
                     ),
                 ),
             ),
@@ -23,7 +23,7 @@ return array(
     ),
     'controllers' => array(
         'invokables' => array(
-            'LoginApp\Controller\Index' => 'LoginApp\Controller\IndexController',
+            'MainApp\Controller\Index' => 'MainApp\Controller\IndexController',
         ),
     ),
     'view_manager' => array(

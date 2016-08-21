@@ -7,7 +7,7 @@
  * {CAMEMIS App} can not be copied and/or distributed without the express
  * permission of {KAOM Vibolrith, CAMEMIS Germany}
  ******************************************************************************/
-namespace LoginApp\Controller;
+namespace MainApp\Controller;
 
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\Http\Response;

@@ -8,7 +8,7 @@
 * permission of {KAOM Vibolrith, CAMEMIS Germany}
 * ************************************************************************** */
 
-namespace LoginApp\Model;
+namespace MainApp\Model;
 
 use Zend\Db\Adapter\Adapter;
 use Zend\Db\TableGateway\AbstractTableGateway;

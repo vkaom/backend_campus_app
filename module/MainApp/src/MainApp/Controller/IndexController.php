@@ -1,6 +1,6 @@
 <?php
 
-namespace LoginApp\Controller;
+namespace MainApp\Controller;
 
 use Zend\Db\ResultSet\ResultSet;
 use Zend\Db\Sql\Sql;

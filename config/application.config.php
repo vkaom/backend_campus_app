@@ -9,7 +9,7 @@
  ******************************************************************************/
 return array(
     'modules' => array(
-        'LoginApp',
+        'MainApp',
         'StudentApp',
         'StaffApp'
     ),
