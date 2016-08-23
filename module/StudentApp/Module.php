@@ -13,6 +13,7 @@ use Zend\Mvc\ModuleRouteListener;
 use Zend\Mvc\MvcEvent;
 use Zend\View\Model\JsonModel;
 use StudentApp\Model\StudentTable;
+use StudentApp\Model\StudentAcademicTable;
 
 class Module
 {
@@ -94,6 +95,11 @@ class Module
                 'StudentApp\Model\StudentTable' => function($sm) {
                     $dbAdapter = $sm->get('UserAdapter');
                     $table = new StudentTable($dbAdapter);
+                    return $table;
+                },
+                'StudentAcademicTable' => function ($sm) {
+                    $dbAdapter = $sm->get('UserAdapter');
+                    $table = new StudentAcademicTable($dbAdapter);
                     return $table;
                 },
             ),

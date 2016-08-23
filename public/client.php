@@ -44,12 +44,73 @@ if ($_SERVER['REMOTE_ADDR'] == "127.0.0.1") {
                     //
                 });
             };
-        })
+
+            $scope.actionStudentCurrentAcademic = function () {
+                $http({
+                    method: 'GET', url: "http://<?=$REST_URL;?>/student", headers: {
+                        'Authorization': 'current-academic'
+                    }
+                }).success(function (data, status) {
+                    //....
+                });
+            };
+
+            $scope.actionStudentAttendance = function () {
+                $http({
+                    method: 'GET', url: "http://<?=$REST_URL;?>/student", headers: {
+                        'Authorization': 'student-attendance'
+                    }
+                }).success(function (data, status) {
+                    //....
+                });
+            };
+
+            $scope.actionStudentDiscipline = function () {
+                $http({
+                    method: 'GET', url: "http://<?=$REST_URL;?>/student", headers: {
+                        'Authorization': 'student-discipline'
+                    }
+                }).success(function (data, status) {
+                    //....
+                });
+            };
+
+            $scope.actionStudentGradebook = function () {
+                $http({
+                    method: 'GET', url: "http://<?=$REST_URL;?>/student", headers: {
+                        'Authorization': 'student-gradebook'
+                    }
+                }).success(function (data, status) {
+                    //....
+                });
+            };
+
+            $scope.actionStudentWeeklySchedule = function () {
+                $http({
+                    method: 'GET', url: "http://<?=$REST_URL;?>/student", headers: {
+                        'Authorization': 'student-weekly-schedule'
+                    }
+                }).success(function (data, status) {
+                    //....
+                });
+            };
+
+            $scope.actionStudentDailySchedule = function () {
+                $http({
+                    method: 'GET', url: "http://<?=$REST_URL;?>/student", headers: {
+                        'Authorization': 'student-daily-schedule'
+                    }
+                }).success(function (data, status) {
+                    //....
+                });
+            };
+
+        });
 </script>
 <body ng-app="myApp">
 <div class="container" ng-controller="myCtrl">
     <h2>Check School</h2>
-    <form class="form-horizontal"  ng-submit="actionCheckSchool()" role="form">
+    <form class="form-horizontal" ng-submit="actionCheckSchool()" role="form">
         <div class="form-group">
             <label class="control-label col-sm-2" for="email">School Url:</label>
             <div class="col-sm-10">
@@ -64,7 +125,7 @@ if ($_SERVER['REMOTE_ADDR'] == "127.0.0.1") {
     </form>
     <hr>
     <h2>Logion</h2>
-    <form class="form-horizontal"  ng-submit="actionLogin()" role="form">
+    <form class="form-horizontal" ng-submit="actionLogin()" role="form">
         <div class="form-group">
             <label class="control-label col-sm-2" for="pwd">Login-Name:</label>
             <div class="col-sm-10">
@@ -93,16 +154,24 @@ if ($_SERVER['REMOTE_ADDR'] == "127.0.0.1") {
         </div>
     </form>
     <hr>
+    <h2>Student (Current Academic)</h2>
+    <div class="form-group">
+        <button ng-click="actionStudentCurrentAcademic();" class="btn btn-default">Check...</button>
+    </div>
+    <hr>
     <h2>Student (Attendance)</h2>
     <div class="form-group">
-        <button type="submit" class="btn btn-default">Check...</button>
+        <button ng-click="actionStudentAttendance();" class="btn btn-default">Check...</button>
     </div>
     <hr>
     <h2>Student (Discipline)</h2>
-    <button type="submit" class="btn btn-default">Check...</button>
+    <button ng-click="actionStudentDiscipline();" class="btn btn-default">Check...</button>
     <hr>
-    <h2>Student (Schedule)</h2>
-    <button type="submit" class="btn btn-default">Check...</button>
+    <h2>Student (Weekly Schedule)</h2>
+    <button ng-click="actionStudentWeeklySchedule();" class="btn btn-default">Check...</button>
+    <hr>
+    <h2>Student (Daily Schedule)</h2>
+    <button ng-click="actionStudentDailySchedule();" class="btn btn-default">Check...</button>
     <hr>
     <h2>Student (Gradebook)</h2>
     <button type="submit" class="btn btn-default">Check...</button>

@@ -15,10 +15,7 @@ use Zend\Mvc\ModuleRouteListener;
 use Zend\Mvc\MvcEvent;
 use Zend\View\Model\JsonModel;
 use MainApp\Model\LoginTable;
-
-use Zend\Di\Di;
-use Zend\Di\Definition;
-use Zend\Di\Definition\Builder;
+use MainApp\Model\StudentAcademicTable;
 
 class Module
 {
@@ -127,6 +124,7 @@ class Module
                     $table = new LoginTable($dbAdapter);
                     return $table;
                 },
+
             ),
         );
     }

@@ -19,67 +19,57 @@ class StudentController extends AbstractRestfulJsonController
     public function getList()
     {
 
-       echo $this->getServiceLocator()->get("getTokenId");
-
-
-        if (!$this->getServiceLocator()->get("UserLogin")) {
-            exit();
-        }
-
-        $sm = $this->getServiceLocator();
-        $this->studentTable = $sm->get('StudentApp\Model\StudentTable');
-        //var_dump($this->studentTable->fetchAll());
-
         $data = array();
-
-        foreach($sm->get('StudentApp\Model\StudentTable') as $student){
-
+        $userAgent = $this->params()->fromHeader();
+        switch (strtoupper($userAgent["Authorization"])) {
+            case "CURRENT-ACADEMIC":
+                $studentAcademicTable = $this->getServiceLocator()->get("StudentAcademicTable");
+                $data = $studentAcademicTable->getStudentCurrentAcademics($this->getServiceLocator()->get("getTokenId"));
+                break;
+            case "STUDENT-ATTENDANCE":
+                $data = array("actionKey" => strtoupper($userAgent["Authorization"]));
+                break;
+            case "STUDENT-DISCIPLINE":
+                $data = array("actionKey" =>strtoupper($userAgent["Authorization"]));
+                break;
+            case "STUDENT-GRADEBOOK":
+                $data = array("actionKey" => strtoupper($userAgent["Authorization"]));
+                break;
+            case "STUDENT-WEEKLY-SCHEDULE":
+                $data = array("actionKey" => strtoupper($userAgent["Authorization"]));
+                break;
+            case "STUDENT-DAILY-SCHEDULE":
+                $data = array("actionKey" => strtoupper($userAgent["Authorization"]));
+                break;
         }
 
         return new JsonModel(
-            array('data' =>
-                $this->studentTable->fetchAll()
-            )
+            array('data' => $data)
         );
     }
 
+
     public function get($id)
     {
-        if (!$this->getServiceLocator()->get("UserLogin")) {
-            exit();
-        }
 
-        /*
-
-        $sm = $this->getServiceLocator();
-        $this->studentTable = $sm->get('StudentApp\Model\StudentTable');
-        $this->studentTable->getStudentAcademic($id);
-        */
-
-        return new JsonModel(array("data" => array('id' =>  $this->getServiceLocator()->get("getTokenId"))));
+        return new JsonModel(array("data" => array('id' => $this->getServiceLocator()->get("getTokenId"))));
     }
 
     public function create($data)
     {
-        if (!$this->getServiceLocator()->get("UserLogin")) {
-            exit();
-        }
+
         return new JsonModel(array('data' => array('id' => 2, 'Lastname' => 'Thou', 'Firstname' => 'Veasna')));
     }
 
     public function update($id, $data)
     {
-        if (!$this->getServiceLocator()->get("UserLogin")) {
-            exit();
-        }
+
         return new JsonModel(array('data' => array('id' => 3, 'Lastname' => 'Sao', 'Firstname' => 'Sothearak')));
     }
 
     public function delete($id)
     {
-        if (!$this->getServiceLocator()->get("UserLogin")) {
-            exit();
-        }
+
         return new JsonModel(array('data' => 'Staff id 3 deleted'));
     }
 }

@@ -70,6 +70,8 @@ class LoginTable extends AbstractTableGateway
         $facette = $this->getToken($role, $username, $password);
         $data = array();
         if($facette){
+            $session = new Container("User");
+            $session->offsetSet('tokenId', $facette->ID);
             $data["tokenId"] = $facette->ID;
             $data["code"] = $facette->CODE;
             $data["lastname"] = $facette->LASTNAME;
