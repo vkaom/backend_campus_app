@@ -7,7 +7,7 @@
  * {CAMEMIS App} can not be copied and/or distributed without the express
  * permission of {KAOM Vibolrith, CAMEMIS Germany}
  ******************************************************************************/
-if ($_SERVER['REMOTE_ADDR'] == "127.0.0.1") {
+if ($_SERVER['REMOTE_ADDR'] == "127.0.0.1" || $_SERVER['REMOTE_ADDR'] == "::1") {
     $DB_USERNAME = "root";
     $DB_PASSWORD = "";
     $DB_NAME = "camemis_admin";
