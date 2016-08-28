@@ -18,13 +18,14 @@ class StudentController extends AbstractRestfulJsonController
 {
     public function getList()
     {
+        $student_id = $this->getServiceLocator()->get("getTokenId");
 
         $data = array();
         $userAgent = $this->params()->fromHeader();
         switch (strtoupper($userAgent["Authorization"])) {
             case "CURRENT-ACADEMIC":
                 $studentAcademicTable = $this->getServiceLocator()->get("StudentAcademicTable");
-                $data = $studentAcademicTable->getStudentCurrentAcademics($this->getServiceLocator()->get("getTokenId"));
+                $data = $studentAcademicTable->getStudentCurrentAcademics($student_id);
                 break;
             case "STUDENT-ATTENDANCE":
                 $data = array("actionKey" => strtoupper($userAgent["Authorization"]));
@@ -36,6 +37,9 @@ class StudentController extends AbstractRestfulJsonController
                 $data = array("actionKey" => strtoupper($userAgent["Authorization"]));
                 break;
             case "STUDENT-WEEKLY-SCHEDULE":
+                $studentAcademicTable = $this->getServiceLocator()->get("StudentAcademicTable");
+                print_r($studentAcademicTable->getStudentWeeklySchedule($student_id, 75));
+
                 $data = array("actionKey" => strtoupper($userAgent["Authorization"]));
                 break;
             case "STUDENT-DAILY-SCHEDULE":
