@@ -11,7 +11,8 @@ return array(
     'modules' => array(
         'MainApp',
         'StudentApp',
-        'StaffApp'
+        'StaffApp',
+		'ChatApp',
     ),
     'module_listener_options' => array(
         'module_paths' => array(
